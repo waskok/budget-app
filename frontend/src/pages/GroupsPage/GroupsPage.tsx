@@ -59,73 +59,78 @@ const GroupsPage: React.FC = () => {
       refreshGroups();
       setSelectedGroup(null);
     } catch (error) {
-      console.error("Błąd usuwania grupy:", error);
+      console.error("Wystąpił błąd podczas usuwania grupy.");
       toast.error("Nie udało się usunąć grupy.");
     }
   };
 
   return (
-    <div className={styles.container}>
-      <h2>Twoje Grupy</h2>
+      <div className={styles.container}>
+        <h2>Twoje Grupy</h2>
 
-      <div className={styles.form}>
-        <input
-          type="text"
-          placeholder="Nazwa grupy"
-          value={newGroupName}
-          onChange={(e) => setNewGroupName(e.target.value)}
+        <div className={styles.form}>
+          <input
+              type="text"
+              placeholder="Nazwa grupy"
+              value={newGroupName}
+              onChange={(e) => setNewGroupName(e.target.value)}
+          />
+          <button type="button" onClick={handleCreateGroup}>Utwórz Grupę</button>
+        </div>
+
+        <ul className={styles.list}>
+          {groups.map((group) => (
+              <li key={group.id} className={styles.groupItem}>
+                <button
+                    type="button"
+                    onClick={() => setSelectedGroup(group)}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      padding: 0,
+                      margin: 0,
+                      color: "inherit",
+                      font: "inherit",
+                      cursor: "pointer",
+                      flexGrow: 1,
+                      textAlign: "left"
+                    }}
+                >
+                  {group.name}
+                </button>
+                {String(user?.id) === String(group.ownerId) && (
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setGroupToDelete(group);
+                        }}
+                        className={styles.deleteButton}
+                    >
+                      Usuń
+                    </button>
+                )}
+              </li>
+          ))}
+        </ul>
+
+        {selectedGroup && (
+            <GroupMembersPage
+                key={String(selectedGroup.id)}
+                group={selectedGroup}
+                onBack={() => setSelectedGroup(null)}
+            />
+        )}
+
+        <ConfirmModal
+            visible={Boolean(groupToDelete)}
+            title="Usuń grupę"
+            message="Czy na pewno chcesz usunąć tę grupę wraz z powiązanymi danymi?"
+            confirmLabel="Usuń"
+            onConfirm={handleDeleteGroup}
+            onCancel={() => setGroupToDelete(null)}
         />
-        <button onClick={handleCreateGroup}>Utwórz Grupę</button>
       </div>
-
-      <ul className={styles.list}>
-        {groups.map((group) => (
-            <li
-                key={group.id}
-                onClick={() => setSelectedGroup(group)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setSelectedGroup(group);
-                  }
-                }}
-                tabIndex={0}
-                role="button"
-                className={styles.groupItem}
-            >
-            {group.name}
-            {String(user?.id) === String(group.ownerId) && (
-              <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setGroupToDelete(group);
-              }}
-              className={styles.deleteButton}
-            >
-              Usuń
-              </button>
-            )}
-          </li>
-        ))}
-      </ul>
-
-      {selectedGroup && (
-        <GroupMembersPage
-          key={String(selectedGroup.id)}
-          group={selectedGroup}
-          onBack={() => setSelectedGroup(null)}
-        />
-      )}
-
-      <ConfirmModal
-        visible={Boolean(groupToDelete)}
-        title="Usuń grupę"
-        message="Czy na pewno chcesz usunąć tę grupę wraz z powiązanymi danymi?"
-        confirmLabel="Usuń"
-        onConfirm={handleDeleteGroup}
-        onCancel={() => setGroupToDelete(null)}
-      />
-    </div>
   );
 };
 
