@@ -80,11 +80,19 @@ const GroupsPage: React.FC = () => {
 
       <ul className={styles.list}>
         {groups.map((group) => (
-          <li
-            key={group.id}
-            onClick={() => setSelectedGroup(group)}
-            className={styles.groupItem}
-          >
+            <li
+                key={group.id}
+                onClick={() => setSelectedGroup(group)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setSelectedGroup(group);
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                className={styles.groupItem}
+            >
             {group.name}
             {String(user?.id) === String(group.ownerId) && (
               <button

@@ -36,11 +36,11 @@ function parseJwt(token: string): User | null {
     const base64Url = token.split(".")[1];
     const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
     const jsonPayload = decodeURIComponent(
-      window
-        .atob(base64)
-        .split("")
-        .map((c) => `%${("00" + c.charCodeAt(0).toString(16)).slice(-2)}`)
-        .join("")
+        window
+            .atob(base64)
+            .split("")
+            .map((c) => `%${("00" + c.charCodeAt(0).toString(16)).slice(-2)}`)
+            .join("")
     );
     return JSON.parse(jsonPayload);
   } catch (e) {
@@ -50,8 +50,8 @@ function parseJwt(token: string): User | null {
 }
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+                                                                        children,
+                                                                      }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     const token = localStorage.getItem("accessToken");
     if (!token || isTokenExpired(token)) {
@@ -76,6 +76,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const login = useCallback((token: string) => {
+    const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
+    if (!jwtRegex.test(token)) {
+      console.error("Otrzymano nieprawidłowy format tokena.");
+      return;
+    }
+
     const parsedUser = parseJwt(token);
     if (!parsedUser) {
       console.error("Nie udało się sparsować użytkownika z tokena");
@@ -98,8 +104,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [logout]);
 
   const value = useMemo(
-    () => ({ isAuthenticated, login, logout, user }),
-    [isAuthenticated, login, logout, user]
+      () => ({ isAuthenticated, login, logout, user }),
+      [isAuthenticated, login, logout, user]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
