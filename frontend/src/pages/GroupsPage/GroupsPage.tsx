@@ -59,7 +59,8 @@ const GroupsPage: React.FC = () => {
       refreshGroups();
       setSelectedGroup(null);
     } catch (error) {
-      console.error("Wystąpił błąd podczas usuwania grupy.");
+      const safeErrorMessage = error instanceof Error ? error.message : "Nieznany błąd";
+      console.error(`Wystąpił błąd podczas usuwania grupy: ${safeErrorMessage}`);
       toast.error("Nie udało się usunąć grupy.");
     }
   };
