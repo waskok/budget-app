@@ -27,6 +27,9 @@ const GroupNotificationsListener = () => {
     const token = localStorage.getItem("accessToken");
     if (!token) return;
 
+    const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
+    if (!jwtRegex.test(token)) return;
+
     const socket = new WebSocket(getWebSocketUrl(token));
 
     socket.onmessage = (event) => {
@@ -35,13 +38,13 @@ const GroupNotificationsListener = () => {
         if (notification.type === "GROUP_EXPENSE_ADDED") {
           toast.info(notification.message);
         }
-      } catch (error) {
-        console.error("Nie udało się obsłużyć komunikatu grupowego:", error);
+      } catch {
+        console.error("Nie udało się obsłużyć komunikatu grupowego.");
       }
     };
 
-    socket.onerror = (error) => {
-      console.error("Błąd połączenia WebSocket z komunikatami grupowymi:", error);
+    socket.onerror = () => {
+      console.error("Wystąpił błąd połączenia WebSocket z komunikatami grupowymi.");
     };
 
     return () => {
